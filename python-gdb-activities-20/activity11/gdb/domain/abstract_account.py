@@ -44,9 +44,9 @@ class AbstractAccount(IAccount):
         self._balance -= amount
 
     def validate_pin(self, entered_pin: str) -> bool:
-        # TODO: IAccount requires validate_pin(). Return True when entered_pin matches self._pin,
-        #   otherwise raise InvalidPinException (same rule as the Activity 5 Account class).
-        raise NotImplementedError("TODO: implement AbstractAccount.validate_pin()")
+        if self._pin != entered_pin:
+            raise InvalidPinException("Invalid PIN provided")
+        return True
 
     def display_account_info(self) -> None:
         print(f"Account Number: {self._account_number}")
