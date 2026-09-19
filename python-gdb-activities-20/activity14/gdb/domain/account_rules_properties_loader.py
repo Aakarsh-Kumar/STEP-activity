@@ -6,10 +6,22 @@ class AccountRulesPropertiesLoader:
 
     @staticmethod
     def load_rules(account_type: str) -> dict:
-        # TODO (Step 2): Load gdb/resources/config/rules/<account_type in lower case>.properties into a dict.
-        #   1. Build the path relative to this module so it works from any working directory, e.g.
-        #      os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resources", "config", "rules", ...)
-        #   2. If the file does not exist, return an empty dict.
-        #   3. Read it line by line (encoding="utf-8"); skip blank lines and lines starting with "#".
-        #   4. Split each remaining "key=value" line on the FIRST "=" and store the stripped key and value strings.
-        raise NotImplementedError("TODO: implement AccountRulesPropertiesLoader.load_rules()")
+        if not account_type or not account_type.strip():
+            return {}
+        filename = f"{account_type.strip().lower()}.properties"
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resources", "config", "rules", filename)
+        if not os.path.isfile(path):
+            return {}
+        rules = {}
+        with open(path, encoding="utf-8") as rules_file:
+            for line_number, raw_line in enumerate(rules_file, start=1):
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" not in line:
+                    raise ValueError(f"Malformed rule in {filename} at line {line_number}")
+                key, value = line.split("=", 1)
+                if not key.strip() or not value.strip():
+                    raise ValueError(f"Malformed rule in {filename} at line {line_number}")
+                rules[key.strip()] = value.strip()
+        return rules
